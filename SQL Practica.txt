@@ -1,0 +1,487 @@
+PARCIAL
+1) 
+SELECT titulo, autor FROM Libro WHERE precio > 2300
+
+2) 
+SELECT nroVenta, total, fecha, hora FROM Venta
+WHERE fecha BETWEEN '01/08/2023' AND '30/08/2023'
+
+3)
+SELECT c.nombre, c.apellido, c.dni, c.telefono, c.direccion FROM Cliente c
+INNER JOIN Venta v ON c.idCliente = v.idCliente
+WHERE v.fecha BETWEEN '01/01/2022' AND '31/12/2022' AND c.idCliente NOT IN (
+	SELECT idCliente FROM Venta 
+	WHERE fecha NOT BETWEEN '01/01/2022' AND '31/12/2022')
+4)
+SELECT DISTINCT l.titulo, l.autor, l.precio, SUM(dv.cantidad) FROM Cliente c
+LEFT JOIN DetalleVenta dv ON l.idLibro = dv.idLibro
+GROUP BY l.idLibro, l.titulo, l.autor, l.precio
+
+5) 
+SELECT v.nroVenta, v.total, v.fecha, v.hora, c.dni FROM Venta v
+INNER JOIN Cliente c ON v.idCliente = c.idCliente
+INNER JOIN DetalleVenta db ON v.nroVenta = dv.nroVenta
+WHERE dv.precioUnitario > 1000
+ 
+
+SQL
+Ejercicio 1
+
+5)
+SELECT p.nombreP, p.descripcion, p.precio, SUM(d.cantidad) FROM Producto p 
+LEFT JOIN Detalle d ON p.idProducto = d.idProducto
+GROUP BY p.idProducto, p.nombreP, p.descripcion, p.precio
+
+6)
+SELECT c.nombre, c.apellido, c.dni, c.telefono, c.direccion FROM Cliente c
+WHERE c.idCliente IN (
+	SELECT f.idCliente FROM Factura f 
+	INNER JOIN Detalle d ON f.nroTicket = d.nroTicket
+	INNER JOIN Producto p ON d.idProducto = p.idProducto
+	WHERE p.nombre = 'prod1')
+AND c.idCliente IN (
+	SELECT f.idCliente FROM Factura f 
+	INNER JOIN Detalle d ON f.nroTicket = d.nroTicket
+	INNER JOIN Producto p ON d.idProducto = p.idProducto
+	WHERE p.nombre = 'prod2')
+AND c.idCliente NOT IN (
+	SELECT f.idCliente FROM Factura f 
+	INNER JOIN Detalle d ON f.nroTicket = d.nroTicket
+	INNER JOIN Producto p ON d.idProducto = p.idProducto
+	WHERE p.nombre = 'prod3')
+
+7) 
+SELECT f.nroTicket, f.total, f.fecha, f.hora, c.dni FROM Factura f
+INNER JOIN Cliente c ON f.idCliente = c.idCliente
+INNER JOIN Detalle d ON f.nroTicket = d.nroTicket
+INNER JOIN Producto p ON d.idProducto = p.idProducto 
+WHERE p.nombre = 'prod38' OR f.fecha BETWEEN '01/01/2019' AND '31/12/2019'
+
+CORRECCION 
+
+SELECT f.nroTicket, f.total, f.fecha, f.hora, c.dni 
+FROM Factura f
+INNER JOIN Cliente c ON f.idCliente = c.idCliente
+INNER JOIN Detalle d ON f.nroTicket = d.nroTicket
+INNER JOIN Producto p ON d.idProducto = p.idProducto 
+WHERE p.nombre = 'prod38'
+
+UNION
+
+SELECT f.nroTicket, f.total, f.fecha, f.hora, c.dni 
+FROM Factura f
+INNER JOIN Cliente c ON f.idCliente = c.idCliente
+WHERE f.fecha BETWEEN '2019-01-01' AND '2019-12-31';
+	
+9)
+SELECT f.nroTicket, f.total, f.fecha, f.hora FROM Factura f
+INNER JOIN Cliente c ON f.idCliente = c.idCliente
+WHERE c.nombre = 'Jorge' AND c.apellido = 'Perez' AND c.idCliente NOT IN (
+	SELECT f2.idCliente FROM Factura f2
+	INNER JOIN Detalle d ON f.nroTicket = d.nroTicket
+	INNER JOIN Producto p ON d.idProducto = p.idProducto
+	WHERE p.nombre = 'Z')
+
+Ejercicio 2
+
+1)
+SELECT a.especie, a.años, a.calle, a.nro, l.nombreL FROM Arbol a
+INNER JOIN Localidad l ON a.codigoPostal = l.codigoPostal 
+INNER JOIN Poda po ON a.nroArbol = po.nroArbol
+INNER JOIN Podador podador ON po.dni = podador.dni
+WHERE podador.nombre = 'Juan' podador.apellido = 'Perez' AND a.nroArbol IN (
+	SELECT po2.nroArbol FROM Poda po2
+	INNER JOIN Podador podador2 ON po2.dni = podador2.dni
+	WHERE podador2.nombre = 'Jose' podador2.apellido = 'Garcia')
+
+5) 
+SELECT p.dni, p.nombre, p.apellido, p.fnac, l.nombre FROM Podador p 
+INNER JOIN Localidad l ON p.codigoPostal = l.codigoPostal
+INNER JOIN Poda po ON p.dni = po.dni
+WHERE p.apellido LIKE '%ata' AND po.fecha BETWEEN '01/01/2024' AND '31/12/2024'
+ORDER BY p.apellido, p.nombre
+
+6) 
+SELECT p.dni, p.nombre, p.apellido, p.fnac FROM Podador p
+INNER JOIN Poda po ON p.dni = po.dni
+INNER JOIN Arbol a ON po.nroArbol = a.nroArbol
+WHERE a.especie = 'Coniferas' AND p.dni NOT IN (
+	SELECT po2.dni FROM Poda po2 
+	INNER JOIN Arbol a2 ON po2.nroArbol = po2.nroArbol
+	WHERE a2.especie <> 'Conifieras')
+
+7)
+SELECT a.especie, a.año, a.calle, a.nro FROM Arbol a 
+INNER JOIN Localidad l ON a.codigoPostal = l.codigoPostal
+WHERE l.nombreL = 'La Plata' 
+INTERSECT
+SELECT a.especie, a.año, a.calle, a.nro FROM Arbol a 
+INNER JOIN Localidad l ON a.codigoPostal = l.codigoPostal
+WHERE l.nombreL = 'Salta' 
+
+Ejercicio 3
+
+1) 
+SELECT i.dni, i.nombre, i.apellido, i.direccion, i.email FROM Integrante i
+INNER JOIN Recital r ON i.codigoB = r.codigoB 
+WHERE i.fecha_nacimiento BETWEEN '01/01/1980' AND '31/12/1990' AND r.fecha BETWEEN '01/01/2023' AND '31/12/2023'
+
+4) 
+SELECT i.dni, i.nombre, i.apellido, i.email FROM Integrante i
+INNER JOIN Recital r ON i.codigoB = r.codigoB 
+INNER JOIN Escenario e ON r.nroEscenario = e.nroEscenario
+WHERE e.nombre_escenario = 'Gustavo Cerati' 
+
+INTERSECT
+
+SELECT i.dni, i.nombre, i.apellido, i.email FROM Integrante i
+INNER JOIN Recital r ON i.codigoB = r.codigoB 
+INNER JOIN Escenario e ON r.nroEscenario = e.nroEscenario
+WHERE e.nombre_escenario = 'Carlos Gardel' 
+
+5) 
+SELECT b.nombreBanda, b.genero_musical, b.año_creacion FROM Banda b
+INNER JOIN Integrante i ON b.codigoBanda = i.codigoBanda
+GROUP BY b.codigoBanda, b.nombreBanda, b.genero_musical, b.año_creacion
+HAVING Count(i.dni) > 8
+
+8)
+SELECT e.nombre_escenario, COUNT(e.fecha) FROM Escenario e
+INNER JOIN Recital r ON e.nroEscenario = r.nroEscenario 
+WHERE e.fecha BETWEEN '01/01/2024' AND '31/12/2024'
+GROUP BY e.nroEscenario, e.nombre_escenario
+
+9)
+UPDATE Banda SET nombreBanda = 'Memphis La Blusera' WHERE codigoB = (SELECT codigoB FROM Banda WHERE nombreBanda = 'Mempis la Blusera')
+
+Ejercicio4 
+
+6) 
+SELECT p.dni, p.apellido, p.nombre, SUM(c.duracion), AVG(c.duracion) FROM Persona p 
+INNER JOIN Profesor-Curso pc ON p.dni = pc.dni
+INNER JOIN Curso c ON pc.cod_curso = c.cod_curso
+GROUP BY p.dni, p.apellido, p.nombre
+
+7) 
+SELECT c.nombre, c.descripcion FROM Curso c
+INNER JOIN Alumno-Curso ac ON c.cod_curso = ac.cod_curso
+WHERE ac.año = 2024
+GROUP BY c.cod_curso, c.nombre, c.descripcion
+HAVING 
+Count(ac.dni) = (SELECT MAX(totalAlu) FROM (
+	SELECT Count(dni) AS totalAlu FROM Alumno-Curso 
+	WHERE año = 2024
+	GROUP BY cod_curso) 
+OR Count(ac.dni) = (SELECT MIN(totalAlu) FROM (
+	SELECT Count(dni) AS totalAlu FROM Alumno-Curso
+	WHERE año = 2024
+	GROUP BY cod_curso)  
+
+Ejercicio 5
+2)
+SELECT v.fecha, v.hora, c.dni, c.nombre, c.apellido, ori.nombre, des.nombre FROM Viaje v
+INNER JOIN Cliente c ON v.dni = c.dni
+INNER JOIN Ciudad ori = c.cpOrigen = ori.codigoPostal
+INNER JOIN Ciudad des = c.cpDestino = des.codigoPostal
+WHERE v.fecha BETWEEN '01/01/2019' AND '31/12/2019' AND v.descripcion LIKE '%demorado%'
+	
+3)
+SELECT a.razon_social, a.direccion FROM Agencia a
+INNER JOIN Viaje v ON a.razon_sociañ = v.razon_social
+WHERE v.fecha BETWEEN '01/01/2019' AND '31/12/2019' AND a.email LIKE '%@jmail.com'
+
+5) 
+SELECT Count(*) FROM Viaje v
+INNER JOIN Ciudad c ON v.cpDestino = c.codigoPostal
+WHERE v.razon_social = 'TAXI Y' AND c.nombreCiudad = 'Villa Elisa'
+
+6) 
+SELECT c.nombre, c.apellido, c.direccion, c.telefono FROM Cliente c
+INNER JOIN Viaje v ON c.dni = v.dni
+GROUP BY  c.dni, c.nombre, c.apellido, c.direccion c.telefono
+HAVING COUNT(DISTINCT(v.razon_social) = (SELECT Count(razon_social) FROM Agencia)
+
+8)
+SELECT a.razon_social, a.direccion, a.telef FROM Agencia a
+INNER JOIN Viaje v ON c.dni = v.dni
+GROUP BY a.razon_social, a.direccion, a.telef
+HAVING Count(v.fecha) = (SELECT Max(cantViajes) FROM (
+				SELECT Count(fecha) AS cantViajes FROM Viaje 
+				GROUP BY razon_social)
+
+Ejercicio 6
+5) 
+SELECT r.nombre, r.stock, COUNT(DISTINCT(repa.codTec) AS cant_tecnicos FROM Repuesto r
+LEFT JOIN RepuestoReparacion rr ON r.codRep = rr.codRep
+INNER JOIN Reparacion repa ON rr.nroReparac = repa.nroReparac
+GROUP BY r.codRep, r.nombre, r.stock
+
+6) 
+SELECT t.nombre, t.especialidad FROM Tecnico t
+INNER JOIN Reparacion r ON t.codTec = r.codTec
+GROUP BY t.codTec, t.nombre, t.especialidad
+HAVING COUNT(r.nroReparac) = (SELECT MAX(cantRepa) FROM (
+					SELECT COUNT(nroReparac) AS cantRepa FROM Reparacion
+					GROUP BY codTec)
+OR COUNT(r.nroReparac) = (SELECT MIN(cantRepa) FROM (
+					SELECT COUNT(nroReparac) AS cantRepa FROM Reparacion
+					GROUP BY codTec)
+
+9) 
+SELECT r.nombre, r.stock, r.precio FROM Repuesto r
+INNER JOIN RepuestoReparacion rr ON r.codRep = rr.codRep
+INNER JOIN Reparacion repa ON rr.nroReparac = repa.nroReparac
+GROUP BY r.codRep, r.nombre, r.stock, r.precio
+HAVING COUNT(DISTINCT(repa.codTec)) = (SELECT Count(codTec) AS CantidadTecnicos FROM Tecnico)
+
+10)
+SELECT r.fecha, t.nombre, r.precio_total FROM Reparacion r
+INNER JOIN Tecnico t ON r.codTec = t.codTec
+INNER JOIN RepuestoReparacion rr ON r.nroReparac = rr.nroReparac
+GROUP BY r.nroReparac, r.fecha, t.nombre, r.precio_total
+HAVING COUNT(DISINTC(rr.codRep)) >= 10
+
+Ejercicio 7
+
+5)
+SELECT c.nombre, AVG(j.edad) FROM Club c
+INNER JOIN ClubJugador cj ON c.codigoClub = cj.codigoClub
+INNER JOIN Jugador j ON cj.dni = j.dni
+WHERE cj.desde <= '01/12/2024' AND cj.hasta > '01/12/2024'
+GROUP BY c.codigoClub, c.nombre 
+
+6)
+SELECT j.nombre, j.apellido, j.edad, COUNT(DISTINCT(cj.codigoClub)) FROM Jugador j
+INNER JOIN ClubJugador cj ON j.dni = cj.dni
+GROUP BY j.dni, j.nombre, j.apellido, j.edad
+
+7)
+SELECT c.nombre FROM Club c WHERE c.codigoClub NOT IN (
+	SELECT cj.codigoClub FROM ClubJugador cj 
+	INNER JOIN Jugador j ON cj.dni = j.dni
+	INNER JOIN Ciudad city ON j.codigoCiudad = city.codigoCiudad
+	WHERE city.nombre = 'Mar del Plata')
+
+
+Ejercicio 8
+
+1)	
+SELECT i.dni, i.nombre, i.apellido, i.email FROM Integrante i
+INNER JOIN Equipo e ON i.codigoE = e.codigoE
+INNER JOIN Inscripcion ins ON e.codigoE = ins.codigoE
+INNER JOIN TorneoPesca t ON ins.codTorneo = t.codTorneo
+WHERE i.ciudad = 'La Plata' AND t.fecha BETWEEN '01/01/2023' AND '31/12/2023'
+
+2) 
+SELECT e.nombre, e.descripcion FROM Equipo e
+INNER JOIN Inscripcion i ON e.codigoE = i.codigoE
+INNER JOIN TorneoPesca t ON i.codTorneo = t.codTorneo
+WHERE t.fecha BETWEEN '01/01/2020' and '31/12/2020' AND e.codEquipo NOT IN (
+	SELECT ins.codigoE FROM Inscripcion ins 
+	INNER JOIN TorneoPesca t2 ON ins.codTorneo = t2.codTorneo
+	WHERE t2.fecha NOT BETWEEN '01/01/2020' and '31/12/2020')
+
+3)
+SELECT i.dni, i.nombre, i.apellido, i.email, i.ciudad FROM Integrante i
+INNER JOIN Equipo e ON i.codigoE = e.codigoE
+INNER JOIN Inscripcion ins ON e.codigoE = ins.codigoE 
+INNER JOIN TorneoPesca t ON ins.codTorneo = t.codTorneo
+INNER JOIN Laguna l on t.nroLaguna = l.nroLaguna
+WHERE ins.asistio = true AND l.nombre = 'La Salada' AND l.ubicacion = 'Coronel Granada' AND i.codigoE NOT IN (
+	SELECT i2.codigoE FROM Inscripcion i2
+	INNER JOIN TorneoPesca t2 ON i2.codTorneo = t2.codTorneo
+	WHERE t2.fecha BETWEEN '01/01/2023' AND '31/12/2023')
+
+4) 
+SELECT e.nombreE, e.descripcionE FROM Equipo e 
+INNER JOIN Integrante i ON e.codigoE = i.codigoE
+GROUP BY e.codigoE, e.nombreE, e.descripcionE
+HAVING Count(i.dni) >= 5
+ORDER BY e.nombre
+
+5) 
+SELECT e.nombreE, e.descripcionE FROM Equipo e
+INNER JOIN Inscripcion i ON e.codigoE = i.codigoE
+INNER JOIN TorneoPesca t ON i.codTorneo = t.codTorneo
+GROUP BY e.codigoE, e.nombreE, e.descripcionE 
+HAVING COUNT(Distinct(t.nroLaguna)) = (SELECT Count(nroLaguna) FROM Laguna) 
+
+7) 
+SELECT nombreL, ubicacion, extension, descripcion FROM Laguna 
+WHERE nroLaguna NOT IN (
+	SELECT nroLaguna FROM TorneoPesca) 
+
+8)
+SELECT e.nombreE, e.descripcionE FROM Equipo e
+INNER JOIN Inscripcion i ON e.codigoE = i.codigoE
+INNER JOIN TorneoPesca t ON i.codTorneo = t.codTorneo
+WHERE t.fecha BETWEEN '01/01/2024' AND '31/12/2024' AND e.codigoE NOT IN (
+	SELECT i2.codigoE FROM Inscripcion i2
+	INNER JOIN TorneoPesca t2 ON i2.codTorneo = t2.codTorneo 
+	WHERE t2.fecha BETWEEN '01/01/2023' AND '31/12/2023')
+
+9) 
+SELECT i.dni, i.nombre, i.apellido, i.ciudad, i.email FROM Integrante i
+INNER JOIN Equipo e ON i.codigoE = e.codigoE 
+INNER JOIN Inscripcion ins ON e.codigoE = ins.codigoE
+INNER JOIN TorneoPesca t ON ins.codTorneo = t.codTorneo
+INNER JOIN Laguan l ON t.nroLaguna = l.nroLaguna
+WHERE l.nombreL = 'Laguna de Chascomus' AND ins.gano = True
+
+
+EJERCICIO 9
+3) 
+SELECT e.dni, e.nombre, e.apellido, e.direccion FROM Empleado 
+INNER JOIN Equipo eq ON e.dni = eq.dniLider 
+GROUP BY e.dni, e.nombre, e.apellido, e.direccion
+HAVING Count(eq.codEquipo) > 1 
+
+4) 
+SELECT e.dni, e.nombre, e.apellido, e.direccion FROM Empleado e
+INNER JOIN Empleado_Equipo ee ON e.dni = ee.dni
+INNER JOIN Equipo eq ON ee.codEquipo = eq.codEquipo
+INNER JOIN Proyecto p ON (ee.codEquipo = eq.equipoFrontend) OR (ee.codEquipo = eq.equipoBackend)
+WHERE p.nombrP = 'Proyecto X' AND e.dni NOT IN (
+    SELECT p.DNIResponsable FROM Proyecto p
+    UNION
+    SELECT eq.DNILider FROM Equipo eq
+)
+
+5) 
+SELECT e.nombreE, l.dni, l.nombre, l.apellido FROM Equipo e
+INNER JOIN Empleado l ON (e.DNILider = l.dni) 
+WHERE e.descTecnologias LIKE '%Java%' AND e.codEquipo NOT IN (SELECT codEquipo FROM Empleado_Equipo) 
+
+7) 
+SELECT e.dni, e.nombre, e.apellido, e.telefono, e.direccion FROM Empleado e
+INNER JOIN Proyecto p ON e.dni = p.DniResponsable 
+WHERE e.dni NOT IN (SELECT DNILider From Equipo)
+
+8) 
+SELECT e.nombreE, e.descTenologias FROM Equipo e
+INNER JOIN Proyecto p ON e.codEquipo = p.equipoFrontend
+INTERSECT 
+SELECT e2.nombreE, e.descTecnologias FROM Equipo e2
+INNER JOIN Proyecto p2 ON e2.codEquipo = p2.equipoBackend
+
+Ejercicio 11
+1) 
+SELECT v.matricula, v.CUIT, v.nombyAp, v.direccion, v.telefono, COUNT(s.fechaSale) FROM Veterinario 
+INNER JOIN Supervision s ON v.matriucla = s.matricula
+GROUP BY v.matricula, v.CUIT, v.nombyAp, v.direccion, v.telefono
+
+2) 
+SELECT v.CUIT, v.nombyAp, v.direccion, v.telefono FROM Veterinario v
+INNER JOIN Supervision s ON v.matricula = s.matricula
+WHERE s.fechaSale IS NOT NULL
+
+4) 
+UPDATE Veterinario SET nomYAp = 'Pablo Lopez' WHERE matricula = 'MP 10000'
+Ejercicio 12
+1) 
+SELECT c.dni, c.nombYAp, c.direccionC, c.fechaNacimiento, c.celular FROM Cliente c 
+WHERE c.nroCliente NOT IN ( 
+	SELECT nroCliente FROM Atencion	
+	WHERE fecha BETWEEN '01/01/2024' AND '31/12/2024')
+
+2) 
+SELECT b.dnib, b.nombYApB, b.direccionB, b.telefonoContacto, b.mail, COUNT(*) FROM Barbero b
+INNER JOIN Atencion a ON b.codEmpleado = a.codEmpleado 
+WHERE a.fecha BETWEEN '01/01/2023' AND '31/12/2023'
+GROUP BY b.codEmpleado, b.dni, b.nombYApB, b.direccionB, b.telefonoContacto, b.mail 
+
+3) 
+SELECT b.razon_social, b.direccion, b.telefono FROM Barberia b
+INNER JOIN Atencion a ON b.codBarberia = a.codBarberia 
+INNER JOIN Cliente c ON a.nroCliente = c.nroCliente
+WHERE c.dni = 22283566 
+ORDER BY b.razon_social, b.direccion ASC 
+
+4) 
+SELECT b.dnib, b.nombYApB, b.direccionB, b.telefonoContacto, b.mail FROM Barbero b
+INNER JOIN Atencion a ON b.codEmpleado = a.codEmpleado 
+WHERE a.valor > 5000
+
+5) 
+SELECT c.DNI, c.nomYAp, c.direccionC, c.celular FROM Cliente c
+INNER JOIN Atencion a ON c.nroCliente = a.nroCliente
+INNER JOIN Barberia b ON a.codBarberia = b.codBarberia 
+WHERE b.razon_social = 'Corta Barba' AND c.nroCliente IN (
+	SELECT a2.nroCliente FROM Atencion a2
+	INNER JOIN Barberia b2 ON a2.codBarberia = b2.codBarberia
+	WHERE b2.razon_social = 'Barberia Barbara') 
+
+
+6)
+DELETE FROM Atencion WHERE nroCliente= (SELECT nroCliente WHERE DNI = 22.222.222) 
+DELETE FROM Cliente WHERE dni = 22.222.222
+
+7) 
+INSERT INTO Cliente (nroCliente,DNI,nombYAp) VALUES (70,313123,'PEPE MUJICA') 
+
+8) 
+UPDATE Cliente SET nombYAp = 'Pepe Mujica' WHERE dni = 313123
+
+Ejercicio 13
+1) 
+SELECT e.nombreEntrenador, e.fechaNacimiento, e.direccion FROM Entrenador e 
+INNER JOIN Entrenamiento entre ON e.IdEntrenador = entre.IdEntrenador
+WHERE entre.fecha BETWEEN '01/01/2023' AND '31/12/2023'
+
+2) 
+SELECT c.nombreCancha, COUNT(entre.idEntrenamiento) as Cant_Entrenamientos FROM Cancha c
+INNER JOIN Entrenamiento entre ON c.IdCancha = entre.IdCancha 
+INNER JOIN Complejo com ON c.IdComplejo = com.IdComplejo
+WHERE com.nombreComplejo = 'Complejo 1' AND entre.fecha BETWEEN '01/01/2022' AND '31/12/2022'
+GROUP BY c.nombreCancha
+
+3) 
+SELECT c.nombreComplejo FROM Complejo c 
+INNER JOIN Cancha can ON c.idComplejo = can.idComplejo 
+INNER JOIN Entrenamiento entre ON can.idCancha = entre.idCancha 
+INNER JOIN Entrenador e ON entre.idEntrenador = e.idEntrenador
+WHERE e.nombreEntrenador = 'Jorge Gonzalez'
+ORDER BY c.nombreComplejo ASC
+
+4) 
+SELECT e.nombreEntrenador, e.fechaNacimiento, e.direccion FROM Entrenador e 
+INNER JOIN Entrenamiento entre ON e.idEntrenador = entre.IdEntrenador
+INNER JOIN Cancha c ON entre.IdCancha = c.IdCancha
+INNER JOIN Complejo com ON c.IdComplejo = com.IdComplejo
+INNER JOIN Club clu ON com.IdClub = clu.IdClu
+WHERE clu.nombreClub = 'Everton' AND c.IdEntrenador IN (
+	SELECT entre2.idEntrenador FROM Entrenamiento entre2
+	INNER JOIN Cancha c2 ON entre2.IdCancha = c2.IdCancha
+	INNER JOIN Complejo com2 ON c2.IdComplejo = com2.IdComplejo
+	INNER JOIN Club clu2 ON com2.IdClub = clu2.IdClu
+	WHERE clu2.nombreClub = 'Estrella de Berisso')
+
+5) 
+SELECT c.nombreClub, c.ciudad FROM Club c
+INNER JOIN Complejo com ON c.IdClub = com.IdClub
+INNER JOIN Cancha can ON com.IdComplejo = can.IdComplejo
+INNER JOIN Entrenamiento entre ON can.IdCancha = entre.IdCancha
+INNER JOIN Entrenador e ON entre.IdEntrenador = e.IdEntrenador
+WHERE e.nombreEntrenador = 'Marcos Perez'
+
+6) DELETE FROM Entrenamiento WHERE IdEntrenador = (
+				SELECT IdEntrenador FROM Entrenador 
+				WHERE nombreEntrenador = 'Juan Perez')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
